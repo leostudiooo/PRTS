@@ -2,15 +2,21 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { PathPoint, BoundaryData, MapBounds } from '@/types'
 import { defaultBoundaryData } from '@/assets/default-boundary'
+import { calculateTotalDistance } from '@/utils/coordinateUtils'
 
 export const useTrackStore = defineStore('track', () => {
   const pathPoints = ref<PathPoint[]>([])
   const boundaryData = ref<BoundaryData>(defaultBoundaryData)
   const mapBounds = ref<MapBounds | null>(null)
 
-  // 按照排序顺序的路径点
+  // 路径点列表
   const sortedPathPoints = computed(() => {
-    return [...pathPoints.value].sort((a, b) => a.sortNum - b.sortNum)
+    return pathPoints.value
+  })
+
+  // 计算路径总距离（米）
+  const totalDistance = computed(() => {
+    return calculateTotalDistance(pathPoints.value)
   })
 
   // 添加新的路径点
@@ -71,6 +77,7 @@ export const useTrackStore = defineStore('track', () => {
     boundaryData,
     mapBounds,
     sortedPathPoints,
+    totalDistance,
     addPathPoint,
     removePathPoint,
     updatePointsOrder,

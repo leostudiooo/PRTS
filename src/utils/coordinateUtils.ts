@@ -1,4 +1,4 @@
-import type { MapBounds } from '@/types'
+import type { MapBounds, Point } from '@/types'
 
 // 坐标转换: 经纬度 -> 画布坐标
 export function latLngToXY(
@@ -46,5 +46,46 @@ export function xyToLatLng(
   return {
     lat: parseFloat(lat.toFixed(14)),
     lng: parseFloat(lng.toFixed(14))
+  }
+}
+
+// 计算两点间的距离（单位：米）
+export function calculateDistance(p1: Point, p2: Point): number {
+  const R = 6371000 // 地球半径，单位米
+  const lat1 = p1.lat * Math.PI / 180
+  const lat2 = p2.lat * Math.PI / 180
+  const deltaLat = (p2.lat - p1.lat) * Math.PI / 180
+  const deltaLng = (p2.lng - p1.lng) * Math.PI / 180
+
+  const a = Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
+          Math.cos(lat1) * Math.cos(lat2) *
+          Math.sin(deltaLng / 2) * Math.sin(deltaLng / 2)
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+
+  return R * c // 返回距离，单位米
+}
+
+// 计算路径总长度（单位：米）
+export function calculateTotalDistance(points: Point[]): number {
+  if (points.length <= 1) {
+    return 0
+  }
+
+  const sortedPoints = [...points]
+
+  let totalDistance = 0
+  for (let i = 1; i < sortedPoints.length; i++) {
+    totalDistance += calculateDistance(points[i - 1], points[i])
+  }
+
+  return totalDistance
+}
+
+// 格式化距离显示
+export function formatDistance(meters: number): string {
+  if (meters < 1000) {
+    return `${meters.toFixed(1)} 米`
+  } else {
+    return `${(meters / 1000).toFixed(2)} 公里`
   }
 }

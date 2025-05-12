@@ -15,6 +15,11 @@
           >
         </div>
       </div>
+      <div class="col-md-6">
+        <div class="distance-info">
+          <span class="badge bg-secondary">路径总长度: {{ formattedDistance }}</span>
+        </div>
+      </div>
     </div>
 
     <div class="action-buttons">
@@ -81,17 +86,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useTrackStore } from '@/stores/trackStore'
 import MapCanvas from '@/components/MapCanvas.vue'
 import PointsTable from '@/components/PointsTable.vue'
 import ExportPanel from '@/components/ExportPanel.vue'
 import AlertMessage from '@/components/AlertMessage.vue'
 import type { AlertType } from '@/types'
+import { formatDistance } from '@/utils/coordinateUtils'
 
 const store = useTrackStore()
 const exportPanel = ref<InstanceType<typeof ExportPanel> | null>(null)
 const showHelp = ref(false)
+
+// 格式化距离显示
+const formattedDistance = computed(() => {
+  return formatDistance(store.totalDistance)
+})
 
 // 警告消息状态
 const alert = ref({
@@ -186,5 +197,10 @@ function showAlert(message: string, type: AlertType) {
 
 .action-buttons {
   margin-bottom: 15px;
+}
+
+.distance-info .badge {
+  font-size: large;
+  padding: 0.5rem 1rem;
 }
 </style>
