@@ -11,6 +11,7 @@
               <th>序号</th>
               <th>纬度</th>
               <th>经度</th>
+              <th>距前点</th>
               <th>操作</th>
             </tr>
           </thead>
@@ -19,6 +20,9 @@
               <td>{{ point.sortNum }}</td>
               <td>{{ point.lat.toFixed(6) }}</td>
               <td>{{ point.lng.toFixed(6) }}</td>
+              <td>
+                <small>{{ getDistanceFromPrevious(point) }}</small>
+              </td>
               <td>
                 <button
                   class="btn btn-outline-danger btn-sm delete-btn"
@@ -40,12 +44,30 @@ import { ref, onMounted } from 'vue'
 import Sortable from 'sortablejs'
 import { useTrackStore } from '@/stores/trackStore'
 import type { PathPoint } from '@/types'
+import { calculateDistance, formatDistance } from '@/utils/coordinateUtils'
 
 const store = useTrackStore()
 const tableBody = ref<HTMLElement | null>(null)
 
 function removePoint(index: number) {
   store.removePathPoint(index)
+}
+
+// 计算与前一个点的距离
+function getDistanceFromPrevious(point: PathPoint): string {
+  const pointsSorted = [...store.pathPoints].sort((a, b) => a.sortNum - b.sortNum)
+  const currentIndex = pointsSorted.findIndex(p =>
+    p.lat === point.lat && p.lng === point.lng && p.sortNum === point.sortNum
+  )
+
+  if (currentIndex <= 0) {
+    return '-'
+  }
+
+  const prevPoint = pointsSorted[currentIndex - 1]
+  const distance = calculateDistance(prevPoint, point)
+
+  return formatDistance(distance)
 }
 
 onMounted(() => {
@@ -115,11 +137,11 @@ function setupSortable() {
 }
 
 .table-container::-webkit-scrollbar-thumb {
-  background: #aaa;
+  background: #888;
   border-radius: 4px;
 }
 
 .table-container::-webkit-scrollbar-thumb:hover {
-  background: #888;
+  background: #555;
 }
 </style>
