@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h1 class="my-4">地图路径点标记工具</h1>
+    <h1 class="my-4">PRTS 地图路径点标记工具</h1>
 
     <div class="row mb-3">
       <div class="col-md-6">
