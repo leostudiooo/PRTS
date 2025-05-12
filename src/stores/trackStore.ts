@@ -81,7 +81,7 @@ export const useTrackStore = defineStore('track', () => {
   const exportedJSON = computed(() => {
     if (!pathPoints.value) return ''
     if (pathPoints.value.length === 0) return ''
-    const data = { tracks: pathPoints.value }
+    const data = { track: pathPoints.value }
     return JSON.stringify(data, null, 2)
   })
 
