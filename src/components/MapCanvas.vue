@@ -298,6 +298,11 @@ watch(() => [store.pathPoints.length, store.boundaryData], () => {
   width: 100%;
   height: 100%;
   background-color: #f8f9fa;
+  user-select: none; /* 禁用文本选择 */
+  -webkit-user-select: none; /* Safari 支持 */
+  -moz-user-select: none; /* Firefox 支持 */
+  -ms-user-select: none; /* IE/Edge 支持 */
+  cursor: default; /* 设置默认光标 */
 }
 
 .map-info {
@@ -309,5 +314,14 @@ watch(() => [store.pathPoints.length, store.boundaryData], () => {
   border-radius: 4px;
   font-size: 12px;
   z-index: 1000;
+}
+
+/* 防止所有 SVG 元素被选中 */
+svg text, svg circle, svg path, svg rect {
+  pointer-events: all; /* 确保事件仍然触发 */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 </style>
