@@ -166,14 +166,6 @@ function exportJSON() {
   showAlert('路径点已导出！', 'success')
 }
 
-// 重新排序路径点
-function sortPoints() {
-  if (store.pathPoints.length <= 1) return
-
-  store.sortPointsByLongitude()
-  showAlert('路径点已重新排序！', 'info')
-}
-
 // 切换帮助信息显示
 function toggleHelp() {
   showHelp.value = !showHelp.value
