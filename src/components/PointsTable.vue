@@ -16,17 +16,17 @@
             </tr>
           </thead>
           <tbody ref="tableBody">
-            <tr v-for="(point, index) in store.pathPoints" :key="`point-${index}`" class="point-item" :data-index="index">
-              <td>{{ point.sortNum }}</td>
+            <tr v-for="(point, index) in sortedPoints" :key="`point-${index}-${point.lat}-${point.lng}`" class="point-item" :data-index="index">
+              <td>{{ index + 1 }}</td>
               <td>{{ point.lat.toFixed(6) }}</td>
               <td>{{ point.lng.toFixed(6) }}</td>
               <td>
-                <small>{{ getDistanceFromPrevious(point) }}</small>
+                <small>{{ getDistanceFromPrevious(point, index) }}</small>
               </td>
               <td>
                 <button
                   class="btn btn-outline-danger btn-sm delete-btn"
-                  @click="removePoint(index)"
+                  @click="removePoint(findOriginalIndex(point))"
                 >
                   <small>删除</small>
                 </button>
@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import Sortable from 'sortablejs'
 import { useTrackStore } from '@/stores/trackStore'
 import type { PathPoint } from '@/types'
@@ -49,22 +49,31 @@ import { calculateDistance, formatDistance } from '@/utils/coordinateUtils'
 const store = useTrackStore()
 const tableBody = ref<HTMLElement | null>(null)
 
+// 使用计算属性来获取已排序的点
+const sortedPoints = computed(() => {
+  return [...store.pathPoints].sort((a, b) => a.sortNum - b.sortNum)
+})
+
+// 查找点在原始数组中的索引
+function findOriginalIndex(point: PathPoint): number {
+  return store.pathPoints.findIndex(p =>
+    p.lat === point.lat && p.lng === point.lng
+  )
+}
+
 function removePoint(index: number) {
-  store.removePathPoint(index)
+  if (index >= 0) {
+    store.removePathPoint(index)
+  }
 }
 
 // 计算与前一个点的距离
-function getDistanceFromPrevious(point: PathPoint): string {
-  const pointsSorted = [...store.pathPoints].sort((a, b) => a.sortNum - b.sortNum)
-  const currentIndex = pointsSorted.findIndex(p =>
-    p.lat === point.lat && p.lng === point.lng && p.sortNum === point.sortNum
-  )
-
-  if (currentIndex <= 0) {
+function getDistanceFromPrevious(point: PathPoint, index: number): string {
+  if (index <= 0) {
     return '-'
   }
 
-  const prevPoint = pointsSorted[currentIndex - 1]
+  const prevPoint = sortedPoints.value[index - 1]
   const distance = calculateDistance(prevPoint, point)
 
   return formatDistance(distance)
@@ -79,23 +88,27 @@ function setupSortable() {
 
   new Sortable(tableBody.value, {
     animation: 150,
-    onEnd: () => {
+    onEnd: (evt) => {
       if (!tableBody.value) return
 
-      // 获取排序后的行
-      const rows = Array.from(tableBody.value.querySelectorAll('tr'))
-      const newOrder = rows.map(row => parseInt(row.dataset.index || '0'))
+      // 获取拖拽的起始和目标位置
+      const oldIndex = evt.oldIndex !== undefined ? evt.oldIndex : 0
+      const newIndex = evt.newIndex !== undefined ? evt.newIndex : 0
 
-      // 创建排序后的新数组
-      const newPoints: PathPoint[] = []
-      newOrder.forEach((oldIndex, newIndex) => {
-        const point = { ...store.pathPoints[oldIndex] }
-        point.sortNum = newIndex + 1
-        newPoints.push(point)
+      // 深拷贝当前已排序的点
+      const points = JSON.parse(JSON.stringify(sortedPoints.value)) as PathPoint[]
+
+      // 移动元素
+      const item = points.splice(oldIndex, 1)[0]
+      points.splice(newIndex, 0, item)
+
+      // 更新序号 - 确保每个点的sortNum属性与其在数组中的位置一致
+      points.forEach((point, index) => {
+        point.sortNum = index + 1
       })
 
-      // 更新到store
-      store.updatePointsOrder(newPoints)
+      // 更新到store并触发重绘
+      store.updatePointsOrder(points)
     }
   })
 }
