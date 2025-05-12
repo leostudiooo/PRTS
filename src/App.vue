@@ -139,8 +139,7 @@ function exportJSON() {
   }
 
   // 创建下载
-  const exportData = JSON.stringify(store.sortedPathPoints, null, 2)
-  const blob = new Blob([exportData], { type: 'application/json' })
+  const blob = new Blob([store.exportedJSON], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-').substring(0, 19)
 

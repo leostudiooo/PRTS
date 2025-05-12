@@ -9,7 +9,8 @@
         class="form-control"
         rows="8"
         readonly
-        v-model="exportedJSON"
+        v-model="store.exportedJSON"
+        placeholder="导出的 JSON 数据将显示在这里..."
       ></textarea>
     </div>
     <div class="card-footer">
@@ -32,13 +33,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { useTrackStore } from '@/stores/trackStore'
 import AlertMessage from './AlertMessage.vue'
 import type { AlertType } from '@/types'
 
-const store = useTrackStore()
 const exportTextarea = ref<HTMLTextAreaElement | null>(null)
+
+const store = useTrackStore()
 
 // 警告消息状态
 const alert = ref({
@@ -47,21 +49,15 @@ const alert = ref({
   type: 'info' as AlertType
 })
 
-// 导出的JSON字符串
-const exportedJSON = computed(() => {
-  if (store.pathPoints.length === 0) return ''
-  return JSON.stringify(store.sortedPathPoints, null, 2)
-})
-
 // 复制到剪贴板
 async function copyToClipboard() {
-  if (!exportedJSON.value) {
+  if (!store.exportedJSON) {
     showAlert('没有可复制的内容！', 'warning')
     return
   }
 
   try {
-    await navigator.clipboard.writeText(exportedJSON.value)
+    await navigator.clipboard.writeText(store.exportedJSON)
     showAlert('已复制到剪贴板！', 'info')
   } catch (err) {
     showAlert('复制失败！', 'danger')

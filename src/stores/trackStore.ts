@@ -11,7 +11,7 @@ export const useTrackStore = defineStore('track', () => {
 
   // 路径点列表
   const sortedPathPoints = computed(() => {
-    return pathPoints.value
+    return [...pathPoints.value].sort((a, b) => a.sortNum - b.sortNum)
   })
 
   // 计算路径总距离（米）
@@ -35,7 +35,12 @@ export const useTrackStore = defineStore('track', () => {
 
   // 更新路径点顺序
   function updatePointsOrder(newOrder: PathPoint[]) {
-    pathPoints.value = newOrder
+    // 确保更新排序号
+    newOrder.forEach((point, index) => {
+      point.sortNum = index + 1
+    })
+
+    pathPoints.value = JSON.parse(JSON.stringify(newOrder))
   }
 
   // 清除所有路径点
@@ -52,8 +57,8 @@ export const useTrackStore = defineStore('track', () => {
   function calculateBounds() {
     if (!boundaryData.value || !boundaryData.value.paths.length) return
 
-    const lats = boundaryData.value.paths.map(p => p.lat)
-    const lngs = boundaryData.value.paths.map(p => p.lng)
+    const lats = boundaryData.value.paths.map((p) => p.lat)
+    const lngs = boundaryData.value.paths.map((p) => p.lng)
 
     const minLat = Math.min(...lats)
     const maxLat = Math.max(...lats)
@@ -68,9 +73,17 @@ export const useTrackStore = defineStore('track', () => {
       minLat: minLat - latBuffer,
       maxLat: maxLat + latBuffer,
       minLng: minLng - lngBuffer,
-      maxLng: maxLng + lngBuffer
+      maxLng: maxLng + lngBuffer,
     }
   }
+
+  // 导出的JSON字符串
+  const exportedJSON = computed(() => {
+    if (!pathPoints.value) return ''
+    if (pathPoints.value.length === 0) return ''
+    const data = { tracks: pathPoints.value }
+    return JSON.stringify(data, null, 2)
+  })
 
   return {
     pathPoints,
@@ -78,11 +91,12 @@ export const useTrackStore = defineStore('track', () => {
     mapBounds,
     sortedPathPoints,
     totalDistance,
+    exportedJSON,
     addPathPoint,
     removePathPoint,
     updatePointsOrder,
     clearAllPoints,
     setBoundaryData,
-    calculateBounds
+    calculateBounds,
   }
 })
