@@ -37,15 +37,6 @@ export const useTrackStore = defineStore('track', () => {
     pathPoints.value = []
   }
 
-  // 重新排序路径点（按经度）
-  function sortPointsByLongitude() {
-    const sorted = [...pathPoints.value].sort((a, b) => a.lng - b.lng)
-    sorted.forEach((point, index) => {
-      point.sortNum = index + 1
-    })
-    pathPoints.value = sorted
-  }
-
   // 设置边界数据
   function setBoundaryData(data: BoundaryData) {
     boundaryData.value = data
@@ -84,7 +75,6 @@ export const useTrackStore = defineStore('track', () => {
     removePathPoint,
     updatePointsOrder,
     clearAllPoints,
-    sortPointsByLongitude,
     setBoundaryData,
     calculateBounds
   }
