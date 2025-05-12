@@ -6,13 +6,7 @@
       <div class="col-md-6">
         <div class="input-group">
           <label class="input-group-text" for="boundaryFile">上传规则JSON:</label>
-          <input
-            type="file"
-            class="form-control"
-            id="boundaryFile"
-            accept=".json"
-            @change="handleFileSelect"
-          >
+          <input type="file" class="form-control" id="boundaryFile" accept=".json" @change="handleFileSelect">
         </div>
       </div>
       <div class="col-md-6">
@@ -23,31 +17,18 @@
     </div>
 
     <div class="action-buttons">
-      <button
-        class="btn btn-warning me-2"
-        @click="clearPoints"
-      >
+      <button class="btn btn-warning me-2" @click="clearPoints">
         清除所有点
       </button>
-      <button
-        class="btn btn-success me-2"
-        @click="exportJSON"
-      >
+      <button class="btn btn-success me-2" @click="exportJSON">
         导出JSON
       </button>
-      <button
-        class="btn btn-info"
-        @click="toggleHelp"
-      >
+      <button class="btn btn-info" @click="toggleHelp">
         使用帮助
       </button>
     </div>
 
-    <div
-      v-show="showHelp"
-      class="alert alert-info mb-3"
-      transition="fade"
-    >
+    <div v-show="showHelp" class="alert alert-info mb-3" transition="fade">
       <h5>使用说明:</h5>
       <ul>
         <li>点击地图添加路径点</li>
@@ -76,13 +57,13 @@
     </div>
   </div>
 
-  <AlertMessage
-    v-if="alert.show"
-    :message="alert.message"
-    :type="alert.type"
-    :auto-hide="true"
-    :duration="3000"
-  />
+  <AlertMessage v-if="alert.show" :message="alert.message" :type="alert.type" :auto-hide="true" :duration="3000" />
+
+  <footer style="text-align: center; padding-top: 2rem; padding-bottom: 5rem;"> <a
+      href="https://github.com/leostudiooo/PRTS" target="_blank" rel="noopener noreferrer" class="ms-2">
+      <img src="https://img.shields.io/badge/GitHub-leostudiooo/PRTS-brightgreen?style=flat-square&logo=github"
+        alt="Source code on GitHub" />
+    </a></footer>
 </template>
 
 <script setup lang="ts">
