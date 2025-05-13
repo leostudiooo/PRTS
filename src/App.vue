@@ -10,8 +10,9 @@
         </div>
       </div>
       <div class="col-md-6">
-        <div class="distance-info">
-          <span class="badge bg-secondary">路径总长度: {{ formattedDistance }}</span>
+        <div class="info-container">
+          <span class="badge bg-secondary me-2">路径总长度: {{ formattedDistance }}</span>
+          <span class="badge bg-info">预计总时间: {{ formattedTime }}</span>
         </div>
       </div>
     </div>
@@ -34,6 +35,7 @@
         <li>点击地图添加路径点</li>
         <li>可以删除路径点或通过拖动表格行调整点的顺序</li>
         <li>通过上传JSON文件加载自定义边界</li>
+        <li>设置采样时间间隔以计算总时间</li>
         <li>点击导出JSON保存当前所有路径点</li>
       </ul>
     </div>
@@ -46,6 +48,7 @@
       </div>
 
       <div class="col-lg-4">
+        <SettingsPanel class="mb-3" />
         <PointsTable />
       </div>
     </div>
@@ -59,11 +62,12 @@
 
   <AlertMessage v-if="alert.show" :message="alert.message" :type="alert.type" :auto-hide="true" :duration="3000" />
 
-  <footer style="text-align: center; padding-top: 2rem; padding-bottom: 5rem;"> <a
-      href="https://github.com/leostudiooo/PRTS" target="_blank" rel="noopener noreferrer" class="ms-2">
+  <footer style="text-align: center; padding-top: 2rem; padding-bottom: 5rem;">
+    <a href="https://github.com/leostudiooo/PRTS" target="_blank" rel="noopener noreferrer" class="ms-2">
       <img src="https://img.shields.io/badge/GitHub-leostudiooo/PRTS-brightgreen?style=flat-square&logo=github"
         alt="Source code on GitHub" />
-    </a></footer>
+    </a>
+  </footer>
 </template>
 
 <script setup lang="ts">
@@ -73,6 +77,7 @@ import MapCanvas from '@/components/MapCanvas.vue'
 import PointsTable from '@/components/PointsTable.vue'
 import ExportPanel from '@/components/ExportPanel.vue'
 import AlertMessage from '@/components/AlertMessage.vue'
+import SettingsPanel from '@/components/SettingsPanel.vue'
 import type { AlertType } from '@/types'
 import { formatDistance } from '@/utils/coordinateUtils'
 
@@ -83,6 +88,11 @@ const showHelp = ref(false)
 // 格式化距离显示
 const formattedDistance = computed(() => {
   return formatDistance(store.totalDistance)
+})
+
+// 格式化时间显示
+const formattedTime = computed(() => {
+  return store.formattedTime
 })
 
 // 警告消息状态
@@ -179,7 +189,14 @@ function showAlert(message: string, type: AlertType) {
   margin-bottom: 15px;
 }
 
-.distance-info .badge {
+.info-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  height: 100%;
+}
+
+.info-container .badge {
   font-size: large;
   padding: 0.5rem 1rem;
 }

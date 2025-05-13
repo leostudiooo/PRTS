@@ -89,3 +89,27 @@ export function formatDistance(meters: number): string {
     return `${(meters / 1000).toFixed(2)} 公里`
   }
 }
+
+// 格式化时间显示
+export function formatTime(seconds: number): string {
+  if (seconds <= 0) {
+    return '0 秒'
+  }
+
+  if (seconds < 60) {
+    return `${seconds} 秒`
+  } else if (seconds < 3600) {
+    const minutes = Math.floor(seconds / 60)
+    const remainingSeconds = Math.floor(seconds % 60)
+    return `${minutes} 分 ${remainingSeconds > 0 ? remainingSeconds + ' 秒' : ''}`
+  } else {
+    const hours = Math.floor(seconds / 3600)
+    const minutes = Math.floor((seconds % 3600) / 60)
+    const remainingSeconds = Math.floor(seconds % 60)
+
+    let result = `${hours} 小时`
+    if (minutes > 0) result += ` ${minutes} 分`
+    if (remainingSeconds > 0) result += ` ${remainingSeconds} 秒`
+    return result
+  }
+}

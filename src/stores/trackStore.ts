@@ -2,12 +2,14 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { PathPoint, BoundaryData, MapBounds } from '@/types'
 import { defaultBoundaryData } from '@/assets/default-boundary'
-import { calculateTotalDistance } from '@/utils/coordinateUtils'
+import { calculateTotalDistance, formatDistance, formatTime } from '@/utils/coordinateUtils'
 
 export const useTrackStore = defineStore('track', () => {
   const pathPoints = ref<PathPoint[]>([])
   const boundaryData = ref<BoundaryData>(defaultBoundaryData)
   const mapBounds = ref<MapBounds | null>(null)
+  // 添加采样时间设置（默认为10秒）
+  const sampleTimeInterval = ref<number>(10)
 
   // 路径点列表
   const sortedPathPoints = computed(() => {
@@ -17,6 +19,23 @@ export const useTrackStore = defineStore('track', () => {
   // 计算路径总距离（米）
   const totalDistance = computed(() => {
     return calculateTotalDistance(pathPoints.value)
+  })
+
+  // 计算总路径时间（秒）
+  const totalTime = computed(() => {
+    // 如果路径点数量小于2，则返回0
+    if (sortedPathPoints.value.length < 2) return 0
+
+    // 总路径点数量减1就是路径段数量
+    const segmentCount = sortedPathPoints.value.length - 1
+
+    // 总时间 = 路径段数 × 采样时间间隔
+    return segmentCount * sampleTimeInterval.value
+  })
+
+  // 格式化时间显示
+  const formattedTime = computed(() => {
+    return formatTime(totalTime.value)
   })
 
   // 添加新的路径点
@@ -31,6 +50,11 @@ export const useTrackStore = defineStore('track', () => {
     pathPoints.value.forEach((point, i) => {
       point.sortNum = i + 1
     })
+  }
+
+  // 更新采样时间间隔
+  function updateSampleTimeInterval(interval: number) {
+    sampleTimeInterval.value = interval
   }
 
   // 更新路径点顺序
@@ -79,10 +103,24 @@ export const useTrackStore = defineStore('track', () => {
 
   // 导出的JSON字符串
   const exportedJSON = computed(() => {
-    if (!pathPoints.value) return ''
-    if (pathPoints.value.length === 0) return ''
-    const data = { track: pathPoints.value }
-    return JSON.stringify(data, null, 2)
+    if (!pathPoints.value || pathPoints.value.length === 0) return ''
+
+    const exportData = {
+      tracks: {
+        points: sortedPathPoints.value,
+        metadata: {
+          totalDistance: totalDistance.value,
+          formattedDistance: formatDistance(totalDistance.value),
+          totalTime: totalTime.value,
+          formattedTime: formattedTime.value,
+          sampleTimeInterval: sampleTimeInterval.value,
+          pointCount: pathPoints.value.length,
+          createdAt: new Date().toISOString()
+        }
+      }
+    }
+
+    return JSON.stringify(exportData, null, 2)
   })
 
   return {
@@ -91,10 +129,14 @@ export const useTrackStore = defineStore('track', () => {
     mapBounds,
     sortedPathPoints,
     totalDistance,
+    totalTime,
+    formattedTime,
+    sampleTimeInterval,
     exportedJSON,
     addPathPoint,
     removePathPoint,
     updatePointsOrder,
+    updateSampleTimeInterval,
     clearAllPoints,
     setBoundaryData,
     calculateBounds,
