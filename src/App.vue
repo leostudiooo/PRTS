@@ -40,14 +40,14 @@
       </ul>
     </div>
 
-    <div class="row">
+    <div class="row main-content">
       <div class="col-lg-8">
         <div id="map-container">
           <MapCanvas />
         </div>
       </div>
 
-      <div class="col-lg-4">
+      <div class="col-lg-4 right-panel">
         <SettingsPanel class="mb-3" />
         <PointsTable />
       </div>
@@ -199,5 +199,36 @@ function showAlert(message: string, type: AlertType) {
 .info-container .badge {
   font-size: large;
   padding: 0.5rem 1rem;
+}
+
+.main-content {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.right-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+#map-container {
+  height: 500px; /* 确保与 MapCanvas 一致 */
+  border: none;
+}
+
+/* 在 src/App.vue 的 style 标签中添加 */
+@media (max-width: 991.98px) {
+  #map-container {
+    height: 500px; /* 小屏幕上减小高度 */
+    margin-bottom: 20px;
+  }
+
+  .right-panel {
+    display: block;
+  }
+
+  .points-table-container {
+    height: 400px; /* 小屏幕上减小高度 */
+  }
 }
 </style>

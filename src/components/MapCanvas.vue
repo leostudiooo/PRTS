@@ -290,6 +290,7 @@ watch(() => [store.pathPoints.length, store.boundaryData], () => {
   width: 100%;
   height: 500px;
   border: 1px solid #ccc;
+  border-radius: 4px;
   margin-bottom: 20px;
   overflow: hidden;
 }
@@ -311,7 +312,7 @@ watch(() => [store.pathPoints.length, store.boundaryData], () => {
   left: 10px;
   background: rgba(255,255,255,0.8);
   padding: 5px 10px;
-  border-radius: 4px;
+  border-radius: var(--bs-card-inner-border-radius);
   font-size: 12px;
   z-index: 1000;
 }

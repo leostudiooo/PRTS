@@ -118,7 +118,7 @@ function setupSortable() {
 .points-table-container {
   display: flex;
   flex-direction: column;
-  height: 500px; /* 与地图容器一致的高度 */
+  height: 300px; /* 留出空间给 SettingsPanel */
 }
 
 .table-container {

@@ -1,50 +1,57 @@
 <template>
-  <div class="card mb-3">
-    <div class="card-header bg-light d-flex justify-content-between align-items-center">
-      <h5 class="mb-0">采样时间设置</h5>
-      <span class="badge bg-info">预计总时间: {{ store.formattedTime }}</span>
+  <div class="card settings-panel">
+    <div class="card-header bg-light">
+      <h5 class="mb-0">采样设置</h5>
     </div>
     <div class="card-body">
-      <div class="input-group mb-2">
-        <span class="input-group-text">采样时间间隔</span>
+      <div class="form-group">
+        <label for="sampleTime" class="form-label">采样时间间隔（秒）:</label>
         <input
           type="number"
           class="form-control"
+          id="sampleTime"
+          v-model="sampleTime"
           min="1"
-          max="3600"
-          v-model="sampleInterval"
-          @change="updateInterval"
-        >
-        <span class="input-group-text">秒</span>
-      </div>
-      <div class="form-text text-muted small">
-        采样时间间隔是两个路径点之间的时间，总时间 = (路径点数量-1) × 采样时间间隔
+          step="1"
+          @change="updateSampleTime"
+        />
+        <div class="form-text">设置两个路径点之间的采样时间间隔，用于计算总时间</div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import { useTrackStore } from '@/stores/trackStore'
 
 const store = useTrackStore()
-const sampleInterval = ref(store.sampleTimeInterval)
+const sampleTime = ref(store.sampleTimeInterval)
 
-// 更新采样时间间隔
-function updateInterval() {
-  const interval = parseInt(sampleInterval.value.toString())
-  if (isNaN(interval) || interval < 1) {
-    sampleInterval.value = 1
-  } else if (interval > 3600) {
-    sampleInterval.value = 3600
+function updateSampleTime() {
+  const time = parseInt(sampleTime.value.toString())
+  if (isNaN(time) || time <= 0) {
+    sampleTime.value = 10 // 恢复默认值
   }
+  store.updateSampleTimeInterval(sampleTime.value)
+}
+</script>
 
-  store.updateSampleTimeInterval(sampleInterval.value)
+<style scoped>
+.settings-panel {
+  min-height: 130px;
 }
 
-// 当 store 中的值改变时更新本地值
-watch(() => store.sampleTimeInterval, (newValue) => {
-  sampleInterval.value = newValue
-})
-</script>
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  font-weight: 500;
+}
+
+.form-text {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+</style>
