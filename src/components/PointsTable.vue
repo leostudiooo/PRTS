@@ -88,6 +88,13 @@ function setupSortable() {
 
   new Sortable(tableBody.value, {
     animation: 150,
+    // 为触摸设备添加延迟，防止触摸后立即拖动
+    delay: 150, // 添加延迟，让用户有机会滚动
+    delayOnTouchOnly: true, // 仅在触摸设备上应用延迟
+    touchStartThreshold: 5, // 触摸移动超过这个像素数才开始拖拽
+    // 添加滚动选项，确保可以在触摸设备上滚动
+    scrollSensitivity: 30, // 距离边缘多少像素时开始滚动
+    scrollSpeed: 10, // 滚动速度
     onEnd: (evt) => {
       if (!tableBody.value) return
 
