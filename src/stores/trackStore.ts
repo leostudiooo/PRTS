@@ -106,18 +106,16 @@ export const useTrackStore = defineStore('track', () => {
     if (!pathPoints.value || pathPoints.value.length === 0) return ''
 
     const exportData = {
-      tracks: {
-        points: sortedPathPoints.value,
-        metadata: {
-          totalDistance: totalDistance.value,
-          formattedDistance: formatDistance(totalDistance.value),
-          totalTime: totalTime.value,
-          formattedTime: formattedTime.value,
-          sampleTimeInterval: sampleTimeInterval.value,
-          pointCount: pathPoints.value.length,
-          createdAt: new Date().toISOString()
-        }
-      }
+      track: sortedPathPoints.value,
+      metadata: {
+        totalDistance: totalDistance.value,
+        formattedDistance: formatDistance(totalDistance.value),
+        totalTime: totalTime.value,
+        formattedTime: formattedTime.value,
+        sampleTimeInterval: sampleTimeInterval.value,
+        pointCount: pathPoints.value.length,
+        createdAt: new Date().toISOString(),
+      },
     }
 
     return JSON.stringify(exportData, null, 2)
