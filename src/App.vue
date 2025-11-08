@@ -62,6 +62,8 @@
 
   <AlertMessage v-if="alert.show" :message="alert.message" :type="alert.type" :auto-hide="true" :duration="3000" />
 
+  <AttributionModal :show="showAttributionModal" @agree="handleAttributionAgree" />
+
   <footer style="text-align: center; padding-top: 2rem; padding-bottom: 5rem;">
     <a href="https://github.com/leostudiooo/PRTS" target="_blank" rel="noopener noreferrer" class="ms-2">
       <img src="https://img.shields.io/badge/GitHub-leostudiooo/PRTS-brightgreen?style=flat-square&logo=github"
@@ -71,19 +73,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useTrackStore } from '@/stores/trackStore'
 import MapCanvas from '@/components/MapCanvas.vue'
 import PointsTable from '@/components/PointsTable.vue'
 import ExportPanel from '@/components/ExportPanel.vue'
 import AlertMessage from '@/components/AlertMessage.vue'
 import SettingsPanel from '@/components/SettingsPanel.vue'
+import AttributionModal from '@/components/AttributionModal.vue'
 import type { AlertType } from '@/types'
 import { formatDistance } from '@/utils/coordinateUtils'
+
+const ATTRIBUTION_AGREED_KEY = 'prts_attribution_agreed'
 
 const store = useTrackStore()
 const exportPanel = ref<InstanceType<typeof ExportPanel> | null>(null)
 const showHelp = ref(false)
+const showAttributionModal = ref(false)
 
 // 格式化距离显示
 const formattedDistance = computed(() => {
@@ -179,6 +185,20 @@ function showAlert(message: string, type: AlertType) {
   setTimeout(() => {
     alert.value.show = false
   }, 3000)
+}
+
+// 检查用户是否已同意署名要求
+onMounted(() => {
+  const hasAgreed = localStorage.getItem(ATTRIBUTION_AGREED_KEY)
+  if (!hasAgreed) {
+    showAttributionModal.value = true
+  }
+})
+
+// 处理用户同意署名要求
+function handleAttributionAgree() {
+  localStorage.setItem(ATTRIBUTION_AGREED_KEY, 'true')
+  showAttributionModal.value = false
 }
 </script>
 
